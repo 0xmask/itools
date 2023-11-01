@@ -1,6 +1,7 @@
 package icrypto
 
 import (
+	"crypto/hmac"
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
@@ -30,6 +31,12 @@ func Sha512(data []byte) *Encrypt {
 func Md5(data []byte) *Encrypt {
 	h := md5.Sum(data)
 	return &Encrypt{data: h[:]}
+}
+
+func HmacSha256(data, key []byte) *Encrypt {
+	h := hmac.New(sha256.New, key)
+	_, _ = h.Write(data)
+	return &Encrypt{data: h.Sum(nil)}
 }
 
 func (t *Encrypt) ToHex() string {
