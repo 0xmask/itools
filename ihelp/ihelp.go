@@ -2,9 +2,11 @@ package ihelp
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"runtime/debug"
 	"syscall"
 )
@@ -16,6 +18,12 @@ func ErrCatch() {
 		log.Printf("错误：%v", err)
 		log.Printf("追踪：%s", string(errs))
 	}
+}
+
+// ErrWrap 错误包装
+func ErrWrap(err error) error {
+	_, fn, line, _ := runtime.Caller(1)
+	return errors.Wrap(err, fmt.Sprintf("\n↑track: %s:%d", fn, line))
 }
 
 // Debug kv打印
