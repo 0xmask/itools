@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -73,7 +74,7 @@ func PostForm(url string, header, data *map[string]string) ([]byte, error) {
 		return nil, errors.New(fmt.Sprintf("status code is %d", resp.StatusCode))
 	}
 
-	respData, err := ioutil.ReadAll(resp.Body)
+	respData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +106,40 @@ func PostJSON(url string, header *map[string]string, data interface{}) ([]byte, 
 	//	return nil, errors.New(fmt.Sprintf("status code is %d", resp.StatusCode))
 	//}
 
-	result, err := ioutil.ReadAll(resp.Body)
+	result, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// PostAny post提交数据
+func PostAny(url string, header *map[string]string, data []byte) (*http.Response, error) {
+	body := new(bytes.Buffer)
+	body.Write(data)
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+	if header != nil {
+		for k, v := range *header {
+			req.Header.Set(k, v)
+		}
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
+
+	return resp, nil
+}
+
+func GetRespBody(body io.Reader) ([]byte, error) {
+	result, err := io.ReadAll(body)
 	if err != nil {
 		return nil, err
 	}

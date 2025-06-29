@@ -14,6 +14,8 @@ type Message struct {
 	Data   interface{} `json:"data"`   //响应数据
 }
 
+// GrpcError 格式化status.error
+// 优先使用code，如果status.code不等于0则使用status.code
 func GrpcError(code int, errs ...error) Message {
 	var errMsg interface{}
 	var errCode = code

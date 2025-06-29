@@ -1,9 +1,8 @@
 package imath
 
 import (
-	"fmt"
+	"math"
 	"math/rand"
-	"strconv"
 	"time"
 	"unsafe"
 )
@@ -39,7 +38,5 @@ func RandStr(n int) string {
 
 // Decimal 保留n位小数
 func Decimal(value float64, length int) (res float64) {
-	args := fmt.Sprintf("%%.%df", length)
-	res, _ = strconv.ParseFloat(fmt.Sprintf(args, value), 64)
-	return res
+	return math.Trunc(value*math.Pow10(length)) / math.Pow10(length)
 }
