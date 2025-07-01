@@ -15,8 +15,8 @@ func NewIOrm(db *gorm.DB) *IOrm {
 	return &IOrm{db: db}
 }
 
-// BuildTableIndex 构建索引
-func (t *IOrm) BuildTableIndex(data []TableIndex) error {
+// BuildIndex 构建索引
+func (t *IOrm) BuildIndex(data []TableIndex) error {
 	for _, arr := range data {
 		for _, tableName := range arr.TableName {
 			for _, index := range arr.IndexArr {
@@ -54,6 +54,11 @@ func (t *IOrm) BuildTableIndex(data []TableIndex) error {
 func (t *IOrm) BuildTable(data []TableModel) error {
 	for _, v := range data {
 		for _, tableName := range v.TableName {
+			//建表
+			if err := t.db.Table(tableName).AutoMigrate(&v.Model); err != nil {
+				return err
+			}
+			//分区
 			if v.PartitionType == PartitionRANGE {
 				opt := v.PartitionModel.(PartitionModelRange)
 				for i := 0; i <= opt.AddDays; i++ {
